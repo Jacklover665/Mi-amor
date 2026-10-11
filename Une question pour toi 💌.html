@@ -171,12 +171,12 @@
   // ✏️ À personnaliser
   const CONFIG = {
     question: "Tu veux sortir avec moi ?",
-    subtitle: "Réponds avec ton cœur 🌸",
+    subtitle: "Réponds avec ton cœur 💖",
     foods: [
       ["🍕", "Pizza"], ["🍔", "Burgers"], ["🍰", "Dégustation"],
       ["🎬", "Sortie"], ["🏖️", "Plage"], ["🍝", "Spaghetti"]
     ],
-    finalNote: "P.S. Je t'ai aussi pris des fleurs 💐"
+    finalNote: "P.S. J'ai déjà hâte de te faire sourire et de te voir 😘"
   };
 
   const $ = (id) => document.getElementById(id);
@@ -264,7 +264,7 @@
     $("recap").innerHTML = "Rendez-vous <b>" + dayTxt + "</b> à <b>" + timeTxt +
       "</b>.<br>Au menu : <b>" + state.food + "</b> 🍽️<br>Je passe te chercher 🚗";
     const PHONE = "22879169224"; // +228 79169224
-    const msg = "Coucou 💗 J'ai dit OUI !\n\nVoici notre rendez-vous :\n📅 " + dayTxt + " à " + timeTxt + "\n🍽️ " + state.food + "\n\nJe t'attends 🚗";
+    const msg = "Coucou mon amour 💖\n\nJ'ai dit OUI !\n\nVoici notre rendez-vous :\n📅 " + dayTxt + " à " + timeTxt + "\n🍽️ " + state.food + "\n\nJe t'attends déjà avec le plus grand sourire 😘";
     $("wa").href = "https://wa.me/" + PHONE + "?text=" + encodeURIComponent(msg);
     go(5);
   }
