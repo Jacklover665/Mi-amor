@@ -37,7 +37,8 @@
   * { box-sizing: border-box; }
   html, body { min-height: 100%; margin: 0; }
   body {
-    background: linear-gradient(160deg, var(--bg1), var(--bg2));
+    position: relative;
+    background: radial-gradient(circle at top, #fff8fb 0%, #ffe3ee 30%, #efe4ff 100%);
     background-attachment: fixed;
     color: var(--text);
     font-family: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
@@ -45,21 +46,53 @@
     padding: 20px;
     overflow-x: hidden;
   }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,.75), transparent 30%),
+                radial-gradient(circle at 80% 10%, rgba(255,194,215,.6), transparent 28%),
+                radial-gradient(circle at 50% 80%, rgba(255,255,255,.45), transparent 30%);
+  }
+  .hearts-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .heart-float {
+    position: absolute;
+    opacity: 0;
+    font-size: clamp(1rem, 2vw, 1.8rem);
+    animation: floatHeart linear forwards;
+    filter: drop-shadow(0 6px 12px rgba(232, 68, 127, .18));
+  }
+  @keyframes floatHeart {
+    0% { opacity: 0; transform: translate3d(0, 100vh, 0) scale(.6) rotate(0deg); }
+    12% { opacity: .9; }
+    100% { opacity: 0; transform: translate3d(var(--dx), -20vh, 0) scale(1.4) rotate(18deg); }
+  }
   .card {
     width: 100%; max-width: 480px;
-    background: var(--card);
-    border-radius: 28px;
+    background: rgba(255, 248, 251, .9);
+    border: 1px solid rgba(255,255,255,.5);
+    backdrop-filter: blur(6px);
+    border-radius: 32px;
     padding: 32px 22px 28px;
     text-align: center;
-    box-shadow: 0 14px 40px rgba(232, 68, 127, .18);
+    box-shadow: 0 20px 60px rgba(232, 68, 127, .18);
     position: relative;
+    z-index: 1;
   }
   .step { display: none; }
-  .step.active { display: block; animation: pop .35s ease; }
+  .step.active { display: block; animation: pop .4s ease; }
   @keyframes pop { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { .step.active { animation: none; } }
 
-  .emoji { font-size: 4.2rem; line-height: 1; margin-bottom: 14px; }
+  .emoji { font-size: 4.2rem; line-height: 1; margin-bottom: 14px; animation: bounce 1.6s ease-in-out infinite alternate; }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-6px); } }
   h1, h2 { font-family: Georgia, "Times New Roman", serif; margin: 0 0 8px; line-height: 1.2; }
   h1 { font-size: clamp(1.6rem, 6vw, 2.1rem); }
   h2 { font-size: clamp(1.4rem, 5vw, 1.8rem); }
@@ -70,13 +103,16 @@
   }
   .btn {
     border: 0; cursor: pointer; border-radius: 999px;
-    background: var(--pink); color: var(--on);
+    background: linear-gradient(135deg, var(--pink), #ff7aad);
+    color: var(--on);
     font-weight: 700; font-size: 1.1rem;
     padding: 14px 30px; min-height: 52px;
-    transition: transform .12s ease;
+    transition: transform .12s ease, box-shadow .2s ease;
+    box-shadow: 0 12px 24px rgba(232, 68, 127, .22);
   }
+  .btn:hover { transform: translateY(-1px); }
   .btn:active { transform: scale(.96); }
-  .btn.ghost { background: var(--pink-soft); color: var(--text); }
+  .btn.ghost { background: linear-gradient(135deg, #ffd0df, #f7c5d9); color: var(--text); }
   button:focus-visible, input:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
 
   /* Étape 1 : le bouton "Non" qui s'échappe */
@@ -101,10 +137,11 @@
     display: flex; flex-direction: column; align-items: center; gap: 6px;
     min-height: 92px; transition: transform .15s ease, border-color .15s ease;
   }
+  .tile:hover { transform: translateY(-2px); }
   .tile span:first-child { font-size: 2rem; }
   .tile span:last-child { font-size: .9rem; font-weight: 700; }
   .tile:active { transform: scale(.95); }
-  .tile.sel { border-color: var(--pink); transform: scale(1.06); }
+  .tile.sel { border-color: var(--pink); transform: scale(1.06); box-shadow: 0 10px 18px rgba(232, 68, 127, .15); }
 
   .recap { font-size: 1.15rem; line-height: 1.6; margin: 0 0 18px; }
   .recap b { color: var(--pink); }
@@ -124,7 +161,7 @@
     <h1 id="q1"></h1>
     <p class="sub" id="sub1"></p>
     <div class="arena" id="arena">
-      <button class="btn" id="yes" type="button">Oui 💗</button>
+      <button class="btn" id="yes" type="button">Oui, mon cœur 💗</button>
       <button class="btn ghost" id="no" type="button">Non</button>
     </div>
   </section>
@@ -132,15 +169,15 @@
   <!-- Étape 2 -->
   <section class="step" id="s2">
     <div class="emoji">😲</div>
-    <h2>Attends, tu as vraiment dit oui ?!</h2>
-    <p class="sub">(Je suis super stressé(e) 😅)</p>
-    <button class="btn" id="next2" type="button">D'accord !</button>
+    <h2>Attends… tu me fais fondre là 😍</h2>
+    <p class="sub">(Je suis déjà en train de sourire comme un enfant 🫶)</p>
+    <button class="btn" id="next2" type="button">D'accord, mon amour 💖</button>
   </section>
 
   <!-- Étape 3 -->
   <section class="step" id="s3">
-    <h2>Alors… quand es-tu libre ?</h2>
-    <p class="sub">Choisis un jour et une heure.</p>
+    <h2>Alors… on se voit quand ?</h2>
+    <p class="sub">Choisis un jour et une heure, je suis déjà prêt à te faire sourire.</p>
     <label for="day">Quel jour ? 📅</label>
     <input type="date" id="day">
     <label for="time">Quelle heure ? ⏰</label>
@@ -150,15 +187,15 @@
 
   <!-- Étape 4 -->
   <section class="step" id="s4">
-    <h2>De quoi a-t-on envie ? 🍽️</h2>
-    <p class="sub">Choisis ton ambiance.</p>
+    <h2>On se fait une petite date ? 🍽️</h2>
+    <p class="sub">Choisis ton ambiance préférée, mon cœur.</p>
     <div class="grid" id="foods"></div>
   </section>
 
   <!-- Étape 5 -->
   <section class="step" id="s5">
     <div class="emoji">💌</div>
-    <h2>C'est noté !</h2>
+    <h2>C'est noté, mon amour !</h2>
     <p class="recap" id="recap"></p>
     <p class="sub" id="ps"></p>
     <a class="btn" id="wa" href="#" target="_blank" rel="noopener">Envoyer le récap sur WhatsApp 💬</a>
@@ -171,12 +208,12 @@
   // ✏️ À personnaliser
   const CONFIG = {
     question: "Tu veux sortir avec moi ?",
-    subtitle: "Réponds avec ton cœur 🌸",
+    subtitle: "Réponds avec ton cœur 💖",
     foods: [
       ["🍕", "Pizza"], ["🍔", "Burgers"], ["🍰", "Dégustation"],
       ["🎬", "Sortie"], ["🏖️", "Plage"], ["🍝", "Spaghetti"]
     ],
-    finalNote: "P.S. Je t'ai aussi pris des fleurs 💐"
+    finalNote: "P.S. J'ai déjà hâte de te faire sourire et de te voir 😘"
   };
 
   const $ = (id) => document.getElementById(id);
@@ -185,6 +222,24 @@
   $("q1").textContent = CONFIG.question;
   $("sub1").textContent = CONFIG.subtitle;
   $("ps").textContent = CONFIG.finalNote;
+
+  function launchBackgroundHearts() {
+    const layer = document.querySelector(".hearts-bg") || document.createElement("div");
+    layer.className = "hearts-bg";
+    if (!layer.parentNode) document.body.appendChild(layer);
+
+    for (let i = 0; i < 26; i++) {
+      const h = document.createElement("span");
+      h.className = "heart-float";
+      h.textContent = ["💗", "💖", "💕", "💞"][i % 4];
+      h.style.left = (Math.random() * 100) + "%";
+      h.style.top = (Math.random() * 100) + "%";
+      h.style.animationDuration = (8 + Math.random() * 8) + "s";
+      h.style.animationDelay = (Math.random() * 1.5) + "s";
+      h.style.setProperty("--dx", (Math.random() * 220 - 110) + "px");
+      layer.appendChild(h);
+    }
+  }
 
   function go(n) {
     document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
@@ -204,9 +259,11 @@
     }
   }
 
+  launchBackgroundHearts();
+
   // Le bouton "Non" s'échappe
   const no = $("no"), yes = $("yes"), arena = $("arena");
-  const dodges = ["Non", "Sûr(e) ? 🥺", "Réfléchis…", "Allez !", "Vraiment ?", "Trop tard 😏"];
+  const dodges = ["Non 😅", "Tu es trop chou 🥺", "Tu me fais fondre 💖", "Réfléchis encore…", "Mon cœur dit oui 😍", "C'est inutile, j'te garde 💗", "Tu as déjà gagné 😘"];
   let tries = 0;
   function dodge(e) {
     if (e) e.preventDefault();
@@ -228,9 +285,13 @@
 
   yes.addEventListener("click", (e) => {
     hearts(e.clientX, e.clientY);
+    launchBackgroundHearts();
     setTimeout(() => go(2), 500);
   });
-  $("next2").addEventListener("click", () => go(3));
+  $("next2").addEventListener("click", () => {
+    hearts(window.innerWidth / 2, window.innerHeight / 2);
+    go(3);
+  });
 
   // Date par défaut : demain
   const t = new Date(); t.setDate(t.getDate() + 1);
@@ -264,7 +325,7 @@
     $("recap").innerHTML = "Rendez-vous <b>" + dayTxt + "</b> à <b>" + timeTxt +
       "</b>.<br>Au menu : <b>" + state.food + "</b> 🍽️<br>Je passe te chercher 🚗";
     const PHONE = "22879169224"; // +228 79169224
-    const msg = "Coucou 💗 J'ai dit OUI !\n\nVoici notre rendez-vous :\n📅 " + dayTxt + " à " + timeTxt + "\n🍽️ " + state.food + "\n\nJe t'attends 🚗";
+    const msg = "Coucou mon amour 💖\n\nJ'ai dit OUI !\n\nVoici notre rendez-vous :\n📅 " + dayTxt + " à " + timeTxt + "\n🍽️ " + state.food + "\n\nJe t'attends déjà avec le plus grand sourire 😘";
     $("wa").href = "https://wa.me/" + PHONE + "?text=" + encodeURIComponent(msg);
     go(5);
   }
