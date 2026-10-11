@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Une question pour toi 💌</title>
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg1: #ffe3ee; --bg2: #efe4ff;
+    --card: #fff8fb;
+    --text: #4a1d36;
+    --muted: #94607c;
+    --pink: #e8447f;
+    --pink-soft: #f6b6cf;
+    --on: #ffffff;
+    --tile: #ffffff;
+    --line: #f3c6d8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg1: #2a1020; --bg2: #1d1433;
+      --card: #3a1a2e; --text: #ffe9f2; --muted: #d9a3bd;
+      --pink: #ff6fa3; --pink-soft: #8a3a5e; --on: #2a1020;
+      --tile: #4b2239; --line: #6b3250;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg1: #2a1020; --bg2: #1d1433;
+    --card: #3a1a2e; --text: #ffe9f2; --muted: #d9a3bd;
+    --pink: #ff6fa3; --pink-soft: #8a3a5e; --on: #2a1020;
+    --tile: #4b2239; --line: #6b3250;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; margin: 0; }
+  body {
+    background: linear-gradient(160deg, var(--bg1), var(--bg2));
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+  .card {
+    width: 100%; max-width: 480px;
+    background: var(--card);
+    border-radius: 28px;
+    padding: 32px 22px 28px;
+    text-align: center;
+    box-shadow: 0 14px 40px rgba(232, 68, 127, .18);
+    position: relative;
+  }
+  .step { display: none; }
+  .step.active { display: block; animation: pop .35s ease; }
+  @keyframes pop { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .step.active { animation: none; } }
+
+  .emoji { font-size: 4.2rem; line-height: 1; margin-bottom: 14px; }
+  h1, h2 { font-family: Georgia, "Times New Roman", serif; margin: 0 0 8px; line-height: 1.2; }
+  h1 { font-size: clamp(1.6rem, 6vw, 2.1rem); }
+  h2 { font-size: clamp(1.4rem, 5vw, 1.8rem); }
+  .sub { color: var(--muted); font-size: .95rem; margin: 0 0 22px; }
+
+  button, input {
+    font: inherit;
+  }
+  .btn {
+    border: 0; cursor: pointer; border-radius: 999px;
+    background: var(--pink); color: var(--on);
+    font-weight: 700; font-size: 1.1rem;
+    padding: 14px 30px; min-height: 52px;
+    transition: transform .12s ease;
+  }
+  .btn:active { transform: scale(.96); }
+  .btn.ghost { background: var(--pink-soft); color: var(--text); }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+
+  /* Étape 1 : le bouton "Non" qui s'échappe */
+  .arena { position: relative; height: 150px; margin-top: 8px; }
+  .arena .btn { position: absolute; top: 20px; }
+  #yes { left: 50%; transform: translateX(-125%); transform-origin: center; }
+  #no  { left: 50%; transform: translateX(15%); transition: left .25s ease, top .25s ease; }
+  #yes.big { transition: font-size .2s ease, padding .2s ease; }
+
+  label { display: block; text-align: left; font-weight: 700; margin: 14px 0 6px; font-size: .95rem; }
+  input[type="date"], input[type="time"] {
+    width: 100%; padding: 14px; border-radius: 14px;
+    border: 2px solid var(--line); background: var(--tile); color: var(--text);
+    min-height: 52px;
+  }
+  .form-btn { margin-top: 24px; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
+  .tile {
+    background: var(--tile); border: 2px solid var(--line); border-radius: 18px;
+    padding: 14px 6px; cursor: pointer; color: var(--text);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    min-height: 92px; transition: transform .15s ease, border-color .15s ease;
+  }
+  .tile span:first-child { font-size: 2rem; }
+  .tile span:last-child { font-size: .9rem; font-weight: 700; }
+  .tile:active { transform: scale(.95); }
+  .tile.sel { border-color: var(--pink); transform: scale(1.06); }
+
+  .recap { font-size: 1.15rem; line-height: 1.6; margin: 0 0 18px; }
+  .recap b { color: var(--pink); }
+  .hearts { font-size: 1.6rem; letter-spacing: 6px; margin-top: 10px; }
+  a.btn { display: inline-block; text-decoration: none; margin: 4px 0 10px; }
+
+  .float { position: fixed; pointer-events: none; font-size: 1.4rem; animation: up 2.4s ease-out forwards; }
+  @keyframes up { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-160px); } }
+</style>
+</head>
+<body>
+<main class="card">
+
+  <!-- Étape 1 -->
+  <section class="step active" id="s1">
+    <div class="emoji">🐶</div>
+    <h1 id="q1"></h1>
+    <p class="sub" id="sub1"></p>
+    <div class="arena" id="arena">
+      <button class="btn" id="yes" type="button">Oui 💗</button>
+      <button class="btn ghost" id="no" type="button">Non</button>
+    </div>
+  </section>
+
+  <!-- Étape 2 -->
+  <section class="step" id="s2">
+    <div class="emoji">😲</div>
+    <h2>Attends, tu as vraiment dit oui ?!</h2>
+    <p class="sub">(Je suis super stressé(e) 😅)</p>
+    <button class="btn" id="next2" type="button">D'accord !</button>
+  </section>
+
+  <!-- Étape 3 -->
+  <section class="step" id="s3">
+    <h2>Alors… quand es-tu libre ?</h2>
+    <p class="sub">Choisis un jour et une heure.</p>
+    <label for="day">Quel jour ? 📅</label>
+    <input type="date" id="day">
+    <label for="time">Quelle heure ? ⏰</label>
+    <input type="time" id="time" value="18:00">
+    <button class="btn form-btn" id="next3" type="button">Fixer la date 💗</button>
+  </section>
+
+  <!-- Étape 4 -->
+  <section class="step" id="s4">
+    <h2>De quoi a-t-on envie ? 🍽️</h2>
+    <p class="sub">Choisis ton ambiance.</p>
+    <div class="grid" id="foods"></div>
+  </section>
+
+  <!-- Étape 5 -->
+  <section class="step" id="s5">
+    <div class="emoji">💌</div>
+    <h2>C'est noté !</h2>
+    <p class="recap" id="recap"></p>
+    <p class="sub" id="ps"></p>
+    <a class="btn" id="wa" href="#" target="_blank" rel="noopener">Envoyer le récap sur WhatsApp 💬</a>
+    <div class="hearts">💗💗💗💗💗</div>
+  </section>
+
+</main>
+
+<script>
+  // ✏️ À personnaliser
+  const CONFIG = {
+    question: "Tu veux sortir avec moi ?",
+    subtitle: "Réponds avec ton cœur 🌸",
+    foods: [
+      ["🍕", "Pizza"], ["🍔", "Burgers"], ["🍰", "Dégustation"],
+      ["🎬", "Sortie"], ["🏖️", "Plage"], ["🍝", "Spaghetti"]
+    ],
+    finalNote: "P.S. Je t'ai aussi pris des fleurs 💐"
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const state = { day: "", time: "", food: "" };
+
+  $("q1").textContent = CONFIG.question;
+  $("sub1").textContent = CONFIG.subtitle;
+  $("ps").textContent = CONFIG.finalNote;
+
+  function go(n) {
+    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    $("s" + n).classList.add("active");
+    window.scrollTo(0, 0);
+  }
+
+  function hearts(x, y) {
+    for (let i = 0; i < 10; i++) {
+      const h = document.createElement("div");
+      h.className = "float";
+      h.textContent = ["💗", "💖", "💕"][i % 3];
+      h.style.left = (x + (Math.random() * 120 - 60)) + "px";
+      h.style.top = (y + (Math.random() * 30 - 15)) + "px";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 2500);
+    }
+  }
+
+  // Le bouton "Non" s'échappe
+  const no = $("no"), yes = $("yes"), arena = $("arena");
+  const dodges = ["Non", "Sûr(e) ? 🥺", "Réfléchis…", "Allez !", "Vraiment ?", "Trop tard 😏"];
+  let tries = 0;
+  function dodge(e) {
+    if (e) e.preventDefault();
+    tries++;
+    const aw = arena.clientWidth - no.offsetWidth;
+    const ah = arena.clientHeight - no.offsetHeight;
+    no.style.left = Math.max(0, Math.random() * aw) + "px";
+    no.style.top = Math.max(0, Math.random() * ah) + "px";
+    no.style.transform = "none";
+    no.textContent = dodges[Math.min(tries, dodges.length - 1)];
+    yes.classList.add("big");
+    yes.style.fontSize = (1.1 + tries * 0.12) + "rem";
+    yes.style.padding = (14 + tries * 2) + "px " + (30 + tries * 4) + "px";
+    if (tries >= 8) no.style.display = "none";
+  }
+  no.addEventListener("pointerenter", dodge);
+  no.addEventListener("touchstart", dodge, { passive: false });
+  no.addEventListener("click", dodge);
+
+  yes.addEventListener("click", (e) => {
+    hearts(e.clientX, e.clientY);
+    setTimeout(() => go(2), 500);
+  });
+  $("next2").addEventListener("click", () => go(3));
+
+  // Date par défaut : demain
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  $("day").value = t.toISOString().slice(0, 10);
+
+  $("next3").addEventListener("click", () => {
+    state.day = $("day").value;
+    state.time = $("time").value;
+    if (!state.day || !state.time) { alert("Choisis un jour et une heure 💗"); return; }
+    go(4);
+  });
+
+  // Choix du repas
+  CONFIG.foods.forEach(([icon, name]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "tile";
+    b.innerHTML = "<span>" + icon + "</span><span>" + name + "</span>";
+    b.addEventListener("click", () => {
+      document.querySelectorAll(".tile").forEach(x => x.classList.remove("sel"));
+      b.classList.add("sel");
+      state.food = name;
+      setTimeout(finish, 500);
+    });
+    $("foods").appendChild(b);
+  });
+
+  function finish() {
+    const d = new Date(state.day + "T12:00:00");
+    const dayTxt = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+    const timeTxt = state.time.replace(":", "h");
+    $("recap").innerHTML = "Rendez-vous <b>" + dayTxt + "</b> à <b>" + timeTxt +
+      "</b>.<br>Au menu : <b>" + state.food + "</b> 🍽️<br>Je passe te chercher 🚗";
+    const PHONE = "22879169224"; // +228 79169224
+    const msg = "Coucou 💗 J'ai dit OUI !\n\nVoici notre rendez-vous :\n📅 " + dayTxt + " à " + timeTxt + "\n🍽️ " + state.food + "\n\nJe t'attends 🚗";
+    $("wa").href = "https://wa.me/" + PHONE + "?text=" + encodeURIComponent(msg);
+    go(5);
+  }
+</script>
+</body>
+</html>
